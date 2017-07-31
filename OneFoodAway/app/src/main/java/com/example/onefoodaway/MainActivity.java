@@ -1,7 +1,10 @@
 package com.example.onefoodaway;
 
+import android.Manifest;
 import android.app.Activity;
-import android.support.v7.app.AppCompatActivity;
+import android.content.pm.PackageManager;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.os.Bundle;
 
 import com.mapbox.mapboxsdk.Mapbox;
@@ -14,7 +17,9 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 
 public class MainActivity extends Activity {
     private final String API_KEY = "pk.eyJ1IjoidGVqYXNrYjA0IiwiYSI6ImNqNWxmOTE4ZjJ0bGoycW82YXp4OThyMjMifQ.PkokQMomWDhJiz1aq8TuUA";
+    private final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 100;
     private MapView mapView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -22,19 +27,54 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
         mapView = (MapView) findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
-        mapView.getMapAsync(new OnMapReadyCallback() {
-            @Override
-            public void onMapReady(MapboxMap mapboxMap) {
-                mapboxMap.setMyLocationEnabled(true);
-                CameraPosition cameraPosition = new CameraPosition.Builder()
-                        .target(new LatLng(mapboxMap.getMyLocation()))
-                        .zoom(13)
-                        .bearing(270)
-                        .tilt(20)
-                        .build();
-                mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 5000);
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
+        }
+        else {
+            mapView.getMapAsync(new OnMapReadyCallback() {
+                @Override
+                public void onMapReady(MapboxMap mapboxMap) {
+                    mapboxMap.setMyLocationEnabled(true);
+                    CameraPosition cameraPosition = new CameraPosition.Builder()
+                            .target(new LatLng(mapboxMap.getMyLocation()))
+                            .zoom(13)
+                            .bearing(270)
+                            .tilt(20)
+                            .build();
+                    mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 5000);
+                }
+            });
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+            String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION: {
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    mapView.getMapAsync(new OnMapReadyCallback() {
+                        @Override
+                        public void onMapReady(MapboxMap mapboxMap) {
+                            mapboxMap.setMyLocationEnabled(true);
+                            CameraPosition cameraPosition = new CameraPosition.Builder()
+                                    .target(new LatLng(mapboxMap.getMyLocation()))
+                                    .zoom(13)
+                                    .bearing(270)
+                                    .tilt(20)
+                                    .build();
+                            mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 5000);
+                        }
+                    });
+                } else {
+                    // RIP
+                }
+                return;
             }
-        });
+        }
     }
 
     @Override
