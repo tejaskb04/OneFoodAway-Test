@@ -1,7 +1,6 @@
 package com.example.onefoodaway;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
@@ -9,6 +8,7 @@ import android.support.v4.content.ContextCompat;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
 
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
@@ -31,9 +31,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
-        getSupportActionBar().setLogo(R.drawable.ic_settings_white_48dp);
-        getSupportActionBar().setDisplayUseLogoEnabled(true);
         mapView = (MapView) findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -69,6 +66,12 @@ public class MainActivity extends AppCompatActivity {
                 .setAccessToken(Mapbox.getAccessToken())
                 .setLocation("1600 Pennsylvania Ave NW")
                 .build();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu, menu);
+        return true;
     }
 
     @Override
