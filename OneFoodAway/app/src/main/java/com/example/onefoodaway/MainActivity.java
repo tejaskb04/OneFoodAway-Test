@@ -13,6 +13,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
@@ -99,8 +100,7 @@ public class MainActivity extends AppCompatActivity {
             }
             case R.id.radius: {
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setTitle("Change Radius");
-                builder.setMessage("Set Radius: ");
+                builder.setTitle("Set Radius");
                 final EditText input = new EditText(this);
                 builder.setView(input);
                 builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -110,14 +110,15 @@ public class MainActivity extends AppCompatActivity {
                             radius = Integer.parseInt(input.getText().toString());
                         }
                         catch (NumberFormatException e) {
-                            //AlertDialog.Builder errorBuilder = new AlertDialog.Builder(this);
+                            Toast toast = Toast.makeText(MainActivity.this, "Invalid Input", Toast.LENGTH_SHORT);
+                            toast.show();
                         }
                     }
                 });
                 builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        // DO ACTION
+                        // STUB
                     }
                 });
                 AlertDialog alertDialog = builder.create();
