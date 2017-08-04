@@ -4,5 +4,14 @@
     <item android:id="@+id/settings"
         android:icon="@drawable/ic_settings_white_48dp"
         android:title="Settings"
-        app:showAsAction="ifRoom"/>
+        app:showAsAction="ifRoom">
+        <menu>
+            <item
+                android:id="@+id/recenter"
+                android:title="Recenter"/>
+            <item
+                android:id="@+id/radius"
+                android:title="Radius"/>
+        </menu>
+    </item>
 </menu>

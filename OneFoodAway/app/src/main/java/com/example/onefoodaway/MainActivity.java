@@ -1,14 +1,18 @@
 package com.example.onefoodaway;
 
 import android.Manifest;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
+import android.view.MenuItem;
+import android.widget.EditText;
 
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
@@ -23,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
     private final String API_KEY = "pk.eyJ1IjoidGVqYXNrYjA0IiwiYSI6ImNqNWxmOTE4ZjJ0bGoycW82YXp4OThyMjMifQ.PkokQMomWDhJiz1aq8TuUA";
     private final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 100;
     private MapView mapView;
+    private int radius = 5;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
                     mapView.getMapAsync(new OnMapReadyCallback() {
                         @Override
                         public void onMapReady(MapboxMap mapboxMap) {
+                            mapboxMap.getUiSettings().setCompassEnabled(false);
                             mapboxMap.setMyLocationEnabled(true);
                             CameraPosition cameraPosition = new CameraPosition.Builder()
                                     .target(new LatLng(mapboxMap.getMyLocation()))
@@ -75,6 +81,56 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.recenter: {
+                mapView.getMapAsync(new OnMapReadyCallback() {
+                    @Override
+                    public void onMapReady(MapboxMap mapboxMap) {
+                        mapboxMap.getUiSettings().setCompassEnabled(false);
+                        mapboxMap.setMyLocationEnabled(true);
+                        CameraPosition cameraPosition = new CameraPosition.Builder()
+                                .target(new LatLng(mapboxMap.getMyLocation()))
+                                .build();
+                        mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 500);
+                    }
+                });
+                return true;
+            }
+            case R.id.radius: {
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("Change Radius");
+                builder.setMessage("Set Radius: ");
+                final EditText input = new EditText(this);
+                builder.setView(input);
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        try {
+                            radius = Integer.parseInt(input.getText().toString());
+                        }
+                        catch (NumberFormatException e) {
+                            //AlertDialog.Builder errorBuilder = new AlertDialog.Builder(this);
+                        }
+                    }
+                });
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // DO ACTION
+                    }
+                });
+                AlertDialog alertDialog = builder.create();
+                alertDialog.show();
+                return true;
+            }
+            default: {
+                return super.onOptionsItemSelected(item);
+            }
+        }
+    }
+
+    @Override
     public void onRequestPermissionsResult(int requestCode,
             String permissions[], int[] grantResults) {
         switch (requestCode) {
@@ -89,6 +145,7 @@ public class MainActivity extends AppCompatActivity {
                             mapView.getMapAsync(new OnMapReadyCallback() {
                                 @Override
                                 public void onMapReady(MapboxMap mapboxMap) {
+                                    mapboxMap.getUiSettings().setCompassEnabled(false);
                                     mapboxMap.setMyLocationEnabled(true);
                                     CameraPosition cameraPosition = new CameraPosition.Builder()
                                             .target(new LatLng(mapboxMap.getMyLocation()))
