@@ -22,7 +22,6 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
-import com.mapbox.services.api.geocoding.v5.MapboxGeocoding;
 
 public class MainActivity extends AppCompatActivity {
     private final String API_KEY = "pk.eyJ1IjoidGVqYXNrYjA0IiwiYSI6ImNqNWxmOTE4ZjJ0bGoycW82YXp4OThyMjMifQ.PkokQMomWDhJiz1aq8TuUA";
@@ -69,10 +68,6 @@ public class MainActivity extends AppCompatActivity {
             handler.postAtTime(runnable, System.currentTimeMillis() + INTERVAL);
             handler.postDelayed(runnable, INTERVAL);
         }
-        MapboxGeocoding mapboxGeocoding = new MapboxGeocoding.Builder()
-                .setAccessToken(Mapbox.getAccessToken())
-                .setLocation("1600 Pennsylvania Ave NW")
-                .build();
     }
 
     @Override
