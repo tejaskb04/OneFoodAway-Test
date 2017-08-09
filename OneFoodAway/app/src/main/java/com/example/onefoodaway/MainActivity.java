@@ -26,6 +26,8 @@ import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity {
@@ -98,8 +100,45 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 
-    private void parseUrl(JSONObject locations) {
-        // Write Logic
+    private void parseUrl(JSONObject data) {
+        String id = "";
+        String placeId = "";
+        String name = null;
+        String reference = "";
+        String icon = "";
+        String vicinity = null;
+        double lat, lng;
+        try {
+            JSONArray jsonArray = data.getJSONArray("data");
+            if (data.getString("status").equalsIgnoreCase("OK")) {
+                mapView.getMapAsync(new OnMapReadyCallback() {
+                    @Override
+                    public void onMapReady(MapboxMap mapboxMap) {
+                        mapboxMap.clear();
+                    }
+                });
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject place = jsonArray.getJSONObject(i);
+                    id = place.getString("id");
+                    placeId = place.getString("place_id");
+                    if (!place.isNull("name")) {
+                        name = place.getString("name");
+                    }
+                    if (!place.isNull("vicinity")) {
+                        vicinity = place.getString("vicinity");
+                    }
+                    lat = place.getJSONObject("geometry").getJSONObject("location")
+                            .getDouble("latitude");
+                    lng = place.getJSONObject("geometry").getJSONObject("location")
+                            .getDouble("longitude");
+                    reference = place.getString("reference");
+                    icon = place.getString("icon");
+                    // Create Marker
+                }
+            }
+        } catch (JSONException e) {
+            // Show Error Message
+        }
     }
 
     @Override
