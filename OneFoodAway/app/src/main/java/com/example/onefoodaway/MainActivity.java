@@ -15,6 +15,9 @@ import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
@@ -22,6 +25,8 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
+
+import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity {
     private final String API_KEY = "pk.eyJ1IjoidGVqYXNrYjA0IiwiYSI6ImNqNWxmOTE4ZjJ0bGoycW82YXp4OThyMjMifQ.PkokQMomWDhJiz1aq8TuUA";
@@ -78,6 +83,23 @@ public class MainActivity extends AppCompatActivity {
         stringBuilder.append("&types=").append("bar|cafe|meal_delivery|meal_takeaway|restaurant");
         stringBuilder.append("&sensor=true");
         stringBuilder.append("&key=").append(GOOGE_PLACES_API_KEY);
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(stringBuilder.toString(), null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject jsonObject) {
+                        parseUrl(jsonObject);
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // Show Error Message
+                    }
+                });
+    }
+
+    private void parseUrl(JSONObject locations) {
+        // Write Logic
     }
 
     @Override
@@ -167,7 +189,7 @@ public class MainActivity extends AppCompatActivity {
                     handler.postAtTime(runnable, System.currentTimeMillis() + INTERVAL);
                     handler.postDelayed(runnable, INTERVAL);
                 } else {
-                    // RIP
+                    // STUB
                 }
                 return;
             }
