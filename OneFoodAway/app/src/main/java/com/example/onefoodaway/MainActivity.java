@@ -19,6 +19,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.mapbox.mapboxsdk.Mapbox;
+import com.mapbox.mapboxsdk.annotations.MarkerViewOptions;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
@@ -102,7 +103,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void parseUrl(JSONObject data) {
         String name = null;
-        String icon = "";
         double lat, lng;
         try {
             JSONArray jsonArray = data.getJSONArray("data");
@@ -118,11 +118,19 @@ public class MainActivity extends AppCompatActivity {
                     if (!place.isNull("name")) {
                         name = place.getString("name");
                     }
-                    icon = place.getString("icon");
                     lat = place.getJSONObject("geometry").getJSONObject("location")
                             .getDouble("latitude");
                     lng = place.getJSONObject("geometry").getJSONObject("location")
                             .getDouble("longitude");
+                    final MarkerViewOptions markerViewOptions = new MarkerViewOptions()
+                            .title(name)
+                            .position(new LatLng(lat, lng));
+                    mapView.getMapAsync(new OnMapReadyCallback() {
+                        @Override
+                        public void onMapReady(MapboxMap mapboxMap) {
+                            mapboxMap.addMarker(markerViewOptions);
+                        }
+                    });
                 }
             }
         } catch (JSONException e) {
