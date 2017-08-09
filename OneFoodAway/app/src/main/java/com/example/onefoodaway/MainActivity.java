@@ -25,6 +25,7 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 
 public class MainActivity extends AppCompatActivity {
     private final String API_KEY = "pk.eyJ1IjoidGVqYXNrYjA0IiwiYSI6ImNqNWxmOTE4ZjJ0bGoycW82YXp4OThyMjMifQ.PkokQMomWDhJiz1aq8TuUA";
+    private final String GOOGE_PLACES_API_KEY = "MY_KEY";
     private final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 100;
     private MapView mapView;
     private int radius = 5;
@@ -68,6 +69,15 @@ public class MainActivity extends AppCompatActivity {
             handler.postAtTime(runnable, System.currentTimeMillis() + INTERVAL);
             handler.postDelayed(runnable, INTERVAL);
         }
+    }
+
+    private void displayNearbyLocations(double lat, double lng) {
+        StringBuilder stringBuilder = new StringBuilder("https://maps.googleapis.com/maps/api/place/nearbysearch/json?");
+        stringBuilder.append("location=").append(lat).append(",").append(lng);
+        stringBuilder.append("&radius=").append(radius);
+        stringBuilder.append("&types=").append("bar|cafe|meal_delivery|meal_takeaway|restaurant");
+        stringBuilder.append("&sensor=true");
+        stringBuilder.append("&key=").append(GOOGE_PLACES_API_KEY);
     }
 
     @Override
