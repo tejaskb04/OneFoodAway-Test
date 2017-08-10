@@ -34,7 +34,7 @@ import org.json.JSONObject;
 public class MainActivity extends AppCompatActivity {
 
     private final String API_KEY = "pk.eyJ1IjoidGVqYXNrYjA0IiwiYSI6ImNqNWxmOTE4ZjJ0bGoycW82YXp4OThyMjMifQ.PkokQMomWDhJiz1aq8TuUA";
-    private final String GOOGE_PLACES_API_KEY = "MY_KEY";
+    private final String GOOGE_PLACES_API_KEY = "AIzaSyAH008n41rXGsO2oYtJgZduebNYwN127_I";
     private final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 100;
     private MapView mapView;
     private int radius = 5;
