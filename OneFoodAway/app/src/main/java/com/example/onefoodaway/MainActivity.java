@@ -109,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
         String name = null;
         double lat, lng;
         try {
-            JSONArray jsonArray = data.getJSONArray("data");
+            JSONArray jsonArray = data.getJSONArray("results");
             if (data.getString("status").equalsIgnoreCase("OK")) {
                 mapView.getMapAsync(new OnMapReadyCallback() {
                     @Override
