@@ -100,6 +100,7 @@ public class MainActivity extends AppCompatActivity {
                         // Show Error Message
                     }
                 });
+        AppController.getInstance().addToRequestQueue(jsonObjectRequest);
     }
 
     private void parseUrl(JSONObject data) {
