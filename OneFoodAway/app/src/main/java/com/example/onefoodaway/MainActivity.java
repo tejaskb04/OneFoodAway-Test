@@ -32,6 +32,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity {
+
     private final String API_KEY = "pk.eyJ1IjoidGVqYXNrYjA0IiwiYSI6ImNqNWxmOTE4ZjJ0bGoycW82YXp4OThyMjMifQ.PkokQMomWDhJiz1aq8TuUA";
     private final String GOOGE_PLACES_API_KEY = "MY_KEY";
     private final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 100;
@@ -151,8 +152,6 @@ public class MainActivity extends AppCompatActivity {
                 mapView.getMapAsync(new OnMapReadyCallback() {
                     @Override
                     public void onMapReady(MapboxMap mapboxMap) {
-                        mapboxMap.getUiSettings().setCompassEnabled(false);
-                        mapboxMap.setMyLocationEnabled(true);
                         CameraPosition cameraPosition = new CameraPosition.Builder()
                                 .target(new LatLng(mapboxMap.getMyLocation()))
                                 .build();
