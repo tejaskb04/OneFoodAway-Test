@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
     private final String GOOGE_PLACES_API_KEY = "AIzaSyAH008n41rXGsO2oYtJgZduebNYwN127_I";
     private final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 100;
     private MapView mapView;
-    private int radius = 5;
+    private int radius = 5000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,21 +111,24 @@ public class MainActivity extends AppCompatActivity {
         try {
             JSONArray jsonArray = data.getJSONArray("results");
             if (data.getString("status").equalsIgnoreCase("OK")) {
+                // CLEAR MAP FAULTY LOGIC BELOW
+                /*
                 mapView.getMapAsync(new OnMapReadyCallback() {
                     @Override
                     public void onMapReady(MapboxMap mapboxMap) {
                         mapboxMap.clear();
                     }
                 });
+                */
                 for (int i = 0; i < jsonArray.length(); i++) {
                     JSONObject place = jsonArray.getJSONObject(i);
                     if (!place.isNull("name")) {
                         name = place.getString("name");
                     }
                     lat = place.getJSONObject("geometry").getJSONObject("location")
-                            .getDouble("latitude");
+                            .getDouble("lat");
                     lng = place.getJSONObject("geometry").getJSONObject("location")
-                            .getDouble("longitude");
+                            .getDouble("lng");
                     final MarkerViewOptions markerViewOptions = new MarkerViewOptions()
                             .title(name)
                             .position(new LatLng(lat, lng));
