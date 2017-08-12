@@ -3,6 +3,8 @@ package com.example.onefoodaway;
 import android.Manifest;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
 import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -31,7 +33,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements LocationListener {
 
     private final String API_KEY = "pk.eyJ1IjoidGVqYXNrYjA0IiwiYSI6ImNqNWxmOTE4ZjJ0bGoycW82YXp4OThyMjMifQ.PkokQMomWDhJiz1aq8TuUA";
     private final String GOOGE_PLACES_API_KEY = "AIzaSyAH008n41rXGsO2oYtJgZduebNYwN127_I";
@@ -79,6 +81,98 @@ public class MainActivity extends AppCompatActivity {
             };
             handler.postAtTime(runnable, System.currentTimeMillis() + INTERVAL);
             handler.postDelayed(runnable, INTERVAL);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION: {
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    final int INTERVAL = 1000;
+                    final Handler handler = new Handler();
+                    final Runnable runnable = new Runnable() {
+                        @Override
+                        public void run() {
+                            mapView.getMapAsync(new OnMapReadyCallback() {
+                                @Override
+                                public void onMapReady(MapboxMap mapboxMap) {
+                                    mapboxMap.getUiSettings().setCompassEnabled(false);
+                                    mapboxMap.setMyLocationEnabled(true);
+                                    CameraPosition cameraPosition = new CameraPosition.Builder()
+                                            .target(new LatLng(mapboxMap.getMyLocation()))
+                                            .zoom(13)
+                                            .bearing(270)
+                                            .tilt(20)
+                                            .build();
+                                    mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 5000);
+                                }
+                            });
+                        }
+                    };
+                    handler.postAtTime(runnable, System.currentTimeMillis() + INTERVAL);
+                    handler.postDelayed(runnable, INTERVAL);
+                } else {
+                    // STUB
+                }
+                return;
+            }
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.recenter: {
+                mapView.getMapAsync(new OnMapReadyCallback() {
+                    @Override
+                    public void onMapReady(MapboxMap mapboxMap) {
+                        CameraPosition cameraPosition = new CameraPosition.Builder()
+                                .target(new LatLng(mapboxMap.getMyLocation()))
+                                .build();
+                        mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 500);
+                    }
+                });
+                return true;
+            }
+            case R.id.radius: {
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("Set Radius");
+                final EditText input = new EditText(this);
+                builder.setView(input);
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        try {
+                            radius = Integer.parseInt(input.getText().toString());
+                        }
+                        catch (NumberFormatException e) {
+                            Toast toast = Toast.makeText(MainActivity.this, "Invalid Input", Toast.LENGTH_SHORT);
+                            toast.show();
+                        }
+                    }
+                });
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // STUB
+                    }
+                });
+                AlertDialog alertDialog = builder.create();
+                alertDialog.show();
+                return true;
+            }
+            default: {
+                return super.onOptionsItemSelected(item);
+            }
         }
     }
 
@@ -146,98 +240,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.recenter: {
-                mapView.getMapAsync(new OnMapReadyCallback() {
-                    @Override
-                    public void onMapReady(MapboxMap mapboxMap) {
-                        CameraPosition cameraPosition = new CameraPosition.Builder()
-                                .target(new LatLng(mapboxMap.getMyLocation()))
-                                .build();
-                        mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 500);
-                    }
-                });
-                return true;
-            }
-            case R.id.radius: {
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setTitle("Set Radius");
-                final EditText input = new EditText(this);
-                builder.setView(input);
-                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        try {
-                            radius = Integer.parseInt(input.getText().toString());
-                        }
-                        catch (NumberFormatException e) {
-                            Toast toast = Toast.makeText(MainActivity.this, "Invalid Input", Toast.LENGTH_SHORT);
-                            toast.show();
-                        }
-                    }
-                });
-                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        // STUB
-                    }
-                });
-                AlertDialog alertDialog = builder.create();
-                alertDialog.show();
-                return true;
-            }
-            default: {
-                return super.onOptionsItemSelected(item);
-            }
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode,
-            String permissions[], int[] grantResults) {
-        switch (requestCode) {
-            case MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION: {
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    final int INTERVAL = 1000;
-                    final Handler handler = new Handler();
-                    final Runnable runnable = new Runnable() {
-                        @Override
-                        public void run() {
-                            mapView.getMapAsync(new OnMapReadyCallback() {
-                                @Override
-                                public void onMapReady(MapboxMap mapboxMap) {
-                                    mapboxMap.getUiSettings().setCompassEnabled(false);
-                                    mapboxMap.setMyLocationEnabled(true);
-                                    CameraPosition cameraPosition = new CameraPosition.Builder()
-                                            .target(new LatLng(mapboxMap.getMyLocation()))
-                                            .zoom(13)
-                                            .bearing(270)
-                                            .tilt(20)
-                                            .build();
-                                    mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 5000);
-                                }
-                            });
-                        }
-                    };
-                    handler.postAtTime(runnable, System.currentTimeMillis() + INTERVAL);
-                    handler.postDelayed(runnable, INTERVAL);
-                } else {
-                    // STUB
-                }
-                return;
-            }
-        }
-    }
-
-    @Override
     public void onStart() {
         super.onStart();
         mapView.onStart();
@@ -278,4 +280,45 @@ public class MainActivity extends AppCompatActivity {
         super.onSaveInstanceState(outState);
         mapView.onSaveInstanceState(outState);
     }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        // FAULTY CODE BELOW
+        /*
+        mapView.getMapAsync(new OnMapReadyCallback() {
+            @Override
+            public void onMapReady(MapboxMap mapboxMap) {
+                CameraPosition cameraPosition = new CameraPosition.Builder()
+                        .target(new LatLng(mapboxMap.getMyLocation()))
+                        .zoom(13)
+                        .bearing(270)
+                        .tilt(20)
+                        .build();
+                mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 5000);
+                displayNearbyLocations(mapboxMap.getMyLocation().getLatitude(),
+                        mapboxMap.getMyLocation().getLongitude());
+            }
+        });
+        */
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+
+    }
 }
+
+/*
+BUGS:
+    Changing radius EditText not functional
+*/
