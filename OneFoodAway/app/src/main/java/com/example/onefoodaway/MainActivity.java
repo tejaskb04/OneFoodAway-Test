@@ -204,7 +204,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     }
 
     private void parseUrl(JSONObject data) {
-        String name = null;
+        String title = null;
+        String snippet = null;
         double lat, lng;
         try {
             JSONArray jsonArray = data.getJSONArray("results");
@@ -221,44 +222,24 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 for (int i = 0; i < jsonArray.length(); i++) {
                     JSONObject place = jsonArray.getJSONObject(i);
                     if (!place.isNull("name")) {
-                        name = place.getString("name");
+                        title = place.getString("name");
+                    }
+                    if (!place.isNull("rating") && !place.isNull("price_level")) {
+                        snippet = "Average Rating: " + place.getString("rating") + " " + "Price Level: "
+                                + place.getString("price_level");
                     }
                     lat = place.getJSONObject("geometry").getJSONObject("location")
                             .getDouble("lat");
                     lng = place.getJSONObject("geometry").getJSONObject("location")
                             .getDouble("lng");
                     final MarkerViewOptions markerViewOptions = new MarkerViewOptions()
-                            .title(name)
+                            .title(title)
+                            .snippet(snippet)
                             .position(new LatLng(lat, lng));
                     mapView.getMapAsync(new OnMapReadyCallback() {
                         @Override
                         public void onMapReady(final MapboxMap mapboxMap) {
                             mapboxMap.addMarker(markerViewOptions);
-                            mapboxMap.setOnMarkerClickListener(new MapboxMap.OnMarkerClickListener() {
-                                @Override
-                                public boolean onMarkerClick(@NonNull Marker marker) {
-                                    // Send User to Directions to Location
-                                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                                    builder.setTitle("Need Directions?");
-                                    builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            openUrl("https://www.google.com/maps/dir/?api=1&origin="
-                                                    + mapboxMap.getMyLocation().getLatitude()
-                                                    + "," + mapboxMap.getMyLocation().getLongitude()
-                                                    + "&destination="
-                                            );
-                                        }
-                                    });
-                                    builder.setNegativeButton("NO", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-
-                                        }
-                                    });
-                                    return false;
-                                }
-                            });
                         }
                     });
                 }
