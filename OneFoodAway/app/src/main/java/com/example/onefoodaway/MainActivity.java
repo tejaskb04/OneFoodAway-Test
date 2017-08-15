@@ -122,6 +122,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                     public void onMapReady(MapboxMap mapboxMap) {
                         CameraPosition cameraPosition = new CameraPosition.Builder()
                                 .target(new LatLng(mapboxMap.getMyLocation()))
+                                .bearing(270)
+                                .tilt(20)
                                 .build();
                         mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 500);
                     }
@@ -283,7 +285,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 CameraPosition cameraPosition = new CameraPosition.Builder()
                         .target(new LatLng(mapboxMap.getMyLocation()))
                         .build();
-                mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 500);
+                mapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
                 displayNearbyLocations(mapboxMap.getMyLocation().getLatitude(),
                         mapboxMap.getMyLocation().getLongitude());
             }
