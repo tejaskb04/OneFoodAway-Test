@@ -110,6 +110,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                                             .tilt(20)
                                             .build();
                                     mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 5000);
+                                    displayNearbyLocations(mapboxMap.getMyLocation().getLatitude(),
+                                            mapboxMap.getMyLocation().getLongitude());
                                 }
                             });
                         }
