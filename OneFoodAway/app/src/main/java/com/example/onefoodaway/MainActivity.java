@@ -7,7 +7,6 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.net.Uri;
-import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.os.Bundle;
@@ -58,11 +57,32 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                     MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
         }
         else {
-            final int INTERVAL = 1000;
-            final Handler handler = new Handler();
-            final Runnable runnable = new Runnable() {
+            mapView.getMapAsync(new OnMapReadyCallback() {
                 @Override
-                public void run() {
+                public void onMapReady(MapboxMap mapboxMap) {
+                    mapboxMap.getUiSettings().setCompassEnabled(false);
+                    mapboxMap.setMyLocationEnabled(true);
+                    CameraPosition cameraPosition = new CameraPosition.Builder()
+                            .target(new LatLng(mapboxMap.getMyLocation()))
+                            .zoom(13)
+                            .bearing(270)
+                            .tilt(20)
+                            .build();
+                    mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 5000);
+                    displayNearbyLocations(mapboxMap.getMyLocation().getLatitude(),
+                            mapboxMap.getMyLocation().getLongitude());
+                }
+            });
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION: {
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     mapView.getMapAsync(new OnMapReadyCallback() {
                         @Override
                         public void onMapReady(MapboxMap mapboxMap) {
@@ -79,45 +99,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                                     mapboxMap.getMyLocation().getLongitude());
                         }
                     });
-                }
-            };
-            handler.postAtTime(runnable, System.currentTimeMillis() + INTERVAL); // Change Time Interval
-            handler.postDelayed(runnable, INTERVAL);
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           String permissions[], int[] grantResults) {
-        switch (requestCode) {
-            case MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION: {
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    final int INTERVAL = 1000;
-                    final Handler handler = new Handler();
-                    final Runnable runnable = new Runnable() {
-                        @Override
-                        public void run() {
-                            mapView.getMapAsync(new OnMapReadyCallback() {
-                                @Override
-                                public void onMapReady(MapboxMap mapboxMap) {
-                                    mapboxMap.getUiSettings().setCompassEnabled(false);
-                                    mapboxMap.setMyLocationEnabled(true);
-                                    CameraPosition cameraPosition = new CameraPosition.Builder()
-                                            .target(new LatLng(mapboxMap.getMyLocation()))
-                                            .zoom(13)
-                                            .bearing(270)
-                                            .tilt(20)
-                                            .build();
-                                    mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 5000);
-                                    displayNearbyLocations(mapboxMap.getMyLocation().getLatitude(),
-                                            mapboxMap.getMyLocation().getLongitude());
-                                }
-                            });
-                        }
-                    };
-                    handler.postAtTime(runnable, System.currentTimeMillis() + INTERVAL); // Change Time Interval
-                    handler.postDelayed(runnable, INTERVAL);
                 } else {
                     // STUB
                 }
@@ -296,23 +277,17 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
     @Override
     public void onLocationChanged(Location location) {
-        // FAULTY CODE BELOW
-        /*
         mapView.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(MapboxMap mapboxMap) {
                 CameraPosition cameraPosition = new CameraPosition.Builder()
                         .target(new LatLng(mapboxMap.getMyLocation()))
-                        .zoom(13)
-                        .bearing(270)
-                        .tilt(20)
                         .build();
-                mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 5000);
+                mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 500);
                 displayNearbyLocations(mapboxMap.getMyLocation().getLatitude(),
                         mapboxMap.getMyLocation().getLongitude());
             }
         });
-        */
     }
 
     @Override
@@ -334,4 +309,5 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 /*
 BUGS:
     Changing radius EditText not functional
+    Camera does not center with user
 */
