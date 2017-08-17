@@ -10,7 +10,6 @@ import android.net.Uri;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.os.Bundle;
-import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -23,8 +22,6 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.mapbox.mapboxsdk.Mapbox;
-import com.mapbox.mapboxsdk.annotations.Icon;
-import com.mapbox.mapboxsdk.annotations.IconFactory;
 import com.mapbox.mapboxsdk.annotations.MarkerViewOptions;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
@@ -128,7 +125,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                                 .bearing(270)
                                 .tilt(20)
                                 .build();
-                        mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 1500);
+                        mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 500);
                     }
                 });
                 return true;
@@ -215,10 +212,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                             .getDouble("lat");
                     lng = place.getJSONObject("geometry").getJSONObject("location")
                             .getDouble("lng");
-                    IconFactory iconFactory = IconFactory.getInstance(MainActivity.this);
-                    Icon icon = iconFactory.defaultMarker();
                     final MarkerViewOptions markerViewOptions = new MarkerViewOptions()
-                            .icon(icon)
                             .title(title)
                             .snippet(snippet)
                             .position(new LatLng(lat, lng));
