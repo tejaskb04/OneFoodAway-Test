@@ -2,11 +2,9 @@ package com.example.onefoodaway;
 
 import android.Manifest;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
-import android.net.Uri;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -83,7 +81,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                     });
                 }
             };
-            handler.postAtTime(runnable, System.currentTimeMillis() + INTERVAL); // Change Time Interval
+            handler.postAtTime(runnable, System.currentTimeMillis() + INTERVAL);
             handler.postDelayed(runnable, INTERVAL);
         }
     }
@@ -116,7 +114,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                             });
                         }
                     };
-                    handler.postAtTime(runnable, System.currentTimeMillis() + INTERVAL); // Change Time Interval
+                    handler.postAtTime(runnable, System.currentTimeMillis() + INTERVAL);
                     handler.postDelayed(runnable, INTERVAL);
                 } else {
                     // STUB
@@ -149,7 +147,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             }
             case R.id.radius: {
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setTitle("Set Radius"); // Customize Title
+                builder.setTitle("Set Radius");
                 final EditText input = new EditText(this);
                 builder.setView(input);
                 builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -232,30 +230,12 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                             .position(new LatLng(lat, lng));
                     mapView.getMapAsync(new OnMapReadyCallback() {
                         @Override
-                        public void onMapReady(final MapboxMap mapboxMap) {
+                        public void onMapReady(MapboxMap mapboxMap) {
                             mapboxMap.addMarker(markerViewOptions);
                             mapboxMap.setOnMarkerClickListener(new MapboxMap.OnMarkerClickListener() {
                                 @Override
                                 public boolean onMarkerClick(@NonNull Marker marker) {
                                     // Send User to Directions to Location
-                                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                                    builder.setTitle("Need Directions?");
-                                    builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            openUrl("https://www.google.com/maps/dir/?api=1&origin="
-                                                    + mapboxMap.getMyLocation().getLatitude()
-                                                    + "," + mapboxMap.getMyLocation().getLongitude()
-                                                    + "&destination="
-                                            );
-                                        }
-                                    });
-                                    builder.setNegativeButton("NO", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-
-                                        }
-                                    });
                                     return false;
                                 }
                             });
@@ -266,12 +246,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         } catch (JSONException e) {
             // Show Error Message
         }
-    }
-
-    private void openUrl(String url) {
-        Uri uri = Uri.parse(url);
-        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-        startActivity(intent);
     }
 
     @Override
