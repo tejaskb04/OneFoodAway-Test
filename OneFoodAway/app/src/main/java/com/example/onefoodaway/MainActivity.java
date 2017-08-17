@@ -3,7 +3,8 @@ package com.example.onefoodaway;
 import android.Manifest;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
-import android.os.Handler;
+import android.location.Location;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.os.Bundle;
@@ -31,7 +32,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements MapboxMap.OnMyLocationChangeListener {
 
     private final String API_KEY = "pk.eyJ1IjoidGVqYXNrYjA0IiwiYSI6ImNqNWxmOTE4ZjJ0bGoycW82YXp4OThyMjMifQ.PkokQMomWDhJiz1aq8TuUA";
     private final String GOOGE_PLACES_API_KEY = "AIzaSyAH008n41rXGsO2oYtJgZduebNYwN127_I";
@@ -54,11 +55,31 @@ public class MainActivity extends AppCompatActivity {
                     MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
         }
         else {
-            final int INTERVAL = 1000;
-            final Handler handler = new Handler();
-            final Runnable runnable = new Runnable() {
+            mapView.getMapAsync(new OnMapReadyCallback() {
                 @Override
-                public void run() {
+                public void onMapReady(MapboxMap mapboxMap) {
+                    mapboxMap.getUiSettings().setCompassEnabled(false);
+                    mapboxMap.setMyLocationEnabled(true);
+                    CameraPosition cameraPosition = new CameraPosition.Builder()
+                            .target(new LatLng(mapboxMap.getMyLocation()))
+                            .zoom(13)
+                            .bearing(270)
+                            .tilt(20)
+                            .build();
+                    mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 5000);
+                    displayNearbyLocations(mapboxMap.getMyLocation().getLatitude(),
+                            mapboxMap.getMyLocation().getLongitude());
+                }
+            });
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION: {
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     mapView.getMapAsync(new OnMapReadyCallback() {
                         @Override
                         public void onMapReady(MapboxMap mapboxMap) {
@@ -75,43 +96,6 @@ public class MainActivity extends AppCompatActivity {
                                     mapboxMap.getMyLocation().getLongitude());
                         }
                     });
-                }
-            };
-            handler.postAtTime(runnable, System.currentTimeMillis() + INTERVAL); // Change Time Interval
-            handler.postDelayed(runnable, INTERVAL);
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           String permissions[], int[] grantResults) {
-        switch (requestCode) {
-            case MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION: {
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    final int INTERVAL = 1000;
-                    final Handler handler = new Handler();
-                    final Runnable runnable = new Runnable() {
-                        @Override
-                        public void run() {
-                            mapView.getMapAsync(new OnMapReadyCallback() {
-                                @Override
-                                public void onMapReady(MapboxMap mapboxMap) {
-                                    mapboxMap.getUiSettings().setCompassEnabled(false);
-                                    mapboxMap.setMyLocationEnabled(true);
-                                    CameraPosition cameraPosition = new CameraPosition.Builder()
-                                            .target(new LatLng(mapboxMap.getMyLocation()))
-                                            .zoom(13)
-                                            .bearing(270)
-                                            .tilt(20)
-                                            .build();
-                                    mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 5000);
-                                }
-                            });
-                        }
-                    };
-                    handler.postAtTime(runnable, System.currentTimeMillis() + INTERVAL); // Change Time Interval
-                    handler.postDelayed(runnable, INTERVAL);
                 } else {
                     // STUB
                 }
@@ -136,7 +120,7 @@ public class MainActivity extends AppCompatActivity {
                         CameraPosition cameraPosition = new CameraPosition.Builder()
                                 .target(new LatLng(mapboxMap.getMyLocation()))
                                 .build();
-                        mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 500);
+                        mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 1500);
                     }
                 });
                 return true;
@@ -175,6 +159,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void displayNearbyLocations(double lat, double lng) {
+        System.out.println("hi");
         StringBuilder stringBuilder = new StringBuilder("https://maps.googleapis.com/maps/api/place/nearbysearch/json?");
         stringBuilder.append("location=").append(lat).append(",").append(lng);
         stringBuilder.append("&radius=").append(radius);
@@ -204,15 +189,12 @@ public class MainActivity extends AppCompatActivity {
         try {
             JSONArray jsonArray = data.getJSONArray("results");
             if (data.getString("status").equalsIgnoreCase("OK")) {
-                // FAULTY CODE BELOW
-                /*
                 mapView.getMapAsync(new OnMapReadyCallback() {
                     @Override
                     public void onMapReady(MapboxMap mapboxMap) {
                         mapboxMap.clear();
                     }
                 });
-                */
                 for (int i = 0; i < jsonArray.length(); i++) {
                     JSONObject place = jsonArray.getJSONObject(i);
                     if (!place.isNull("name")) {
@@ -241,6 +223,20 @@ public class MainActivity extends AppCompatActivity {
         } catch (JSONException e) {
             // Show Error Message
         }
+    }
+
+    @Override
+    public void onMyLocationChange(@Nullable final Location location) {
+        mapView.getMapAsync(new OnMapReadyCallback() {
+            @Override
+            public void onMapReady(MapboxMap mapboxMap) {
+                if (location != null) {
+                    mapboxMap.easeCamera(CameraUpdateFactory.newLatLng(new LatLng(location.getLatitude(),
+                            location.getLongitude())));
+                }
+                displayNearbyLocations(location.getLatitude(), location.getLongitude());
+            }
+        });
     }
 
     @Override
