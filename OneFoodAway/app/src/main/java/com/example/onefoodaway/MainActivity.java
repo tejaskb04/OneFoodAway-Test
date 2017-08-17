@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.os.Bundle;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -192,7 +193,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         String title = null;
         String snippet = null;
         double lat, lng;
-        double rating, price_level;
         try {
             JSONArray jsonArray = data.getJSONArray("results");
             if (data.getString("status").equalsIgnoreCase("OK")) {
@@ -208,17 +208,15 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                         title = place.getString("name");
                     }
                     if (!place.isNull("rating") && !place.isNull("price_level")) {
-                        rating = Double.parseDouble(place.getString("rating"));
-                        price_level = Double.parseDouble(place.getString("price_level"));
-                        snippet = "Average Rating: " + rating + " " + "Price Level: "
-                                + price_level;
+                        snippet = "Average Rating: " + place.getString("rating") + " " + "Price Level: "
+                                + place.getString("price_level");
                     }
                     lat = place.getJSONObject("geometry").getJSONObject("location")
                             .getDouble("lat");
                     lng = place.getJSONObject("geometry").getJSONObject("location")
                             .getDouble("lng");
                     IconFactory iconFactory = IconFactory.getInstance(MainActivity.this);
-                    Icon icon = iconFactory.defaultMarker();
+                    Icon icon = iconFactory.fromResource(R.drawable.blue_marker);
                     final MarkerViewOptions markerViewOptions = new MarkerViewOptions()
                             .icon(icon)
                             .title(title)
