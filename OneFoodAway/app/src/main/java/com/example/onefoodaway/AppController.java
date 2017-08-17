@@ -32,10 +32,4 @@ public class AppController extends Application {
         request.setTag("onefoodaway");
         this.getRequestQueue().add(request);
     }
-
-    public void cancelRequests(Object tag) {
-        if (requestQueue != null) {
-            requestQueue.cancelAll(tag);
-        }
-    }
 }
