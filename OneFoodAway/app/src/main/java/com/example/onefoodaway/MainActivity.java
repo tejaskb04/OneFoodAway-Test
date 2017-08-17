@@ -199,6 +199,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void parseUrl(JSONObject data) {
         String name = null;
+        String snippet = null;
         double lat, lng;
         try {
             JSONArray jsonArray = data.getJSONArray("results");
@@ -217,12 +218,17 @@ public class MainActivity extends AppCompatActivity {
                     if (!place.isNull("name")) {
                         name = place.getString("name");
                     }
+                    if (!place.isNull("rating") && !place.isNull("price_level")) {
+                        snippet = "Rating: " + place.getString("rating") + " " + "Price Level: "
+                                + place.getString("price_level");
+                    }
                     lat = place.getJSONObject("geometry").getJSONObject("location")
                             .getDouble("lat");
                     lng = place.getJSONObject("geometry").getJSONObject("location")
                             .getDouble("lng");
                     final MarkerViewOptions markerViewOptions = new MarkerViewOptions()
                             .title(name)
+                            .snippet(snippet)
                             .position(new LatLng(lat, lng));
                     mapView.getMapAsync(new OnMapReadyCallback() {
                         @Override
@@ -279,6 +285,11 @@ public class MainActivity extends AppCompatActivity {
         mapView.onSaveInstanceState(outState);
     }
 }
+
+/*
+TODO:
+    1. Implement External Storage logic
+*/
 
 /*
 BUGS:
