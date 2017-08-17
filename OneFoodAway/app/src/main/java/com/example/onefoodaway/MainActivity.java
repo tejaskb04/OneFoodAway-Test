@@ -290,5 +290,6 @@ TODO:
 /*
 BUGS:
     1. Changing radius of Nearby Food Locations Search not functional
-    2. Camera does not center with user
+    2. New markers do not appear when in range and old markers do not disappear when out of range
+    3. Camera does not center with user
 */
