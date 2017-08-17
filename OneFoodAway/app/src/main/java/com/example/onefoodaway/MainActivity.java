@@ -216,7 +216,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                     lng = place.getJSONObject("geometry").getJSONObject("location")
                             .getDouble("lng");
                     IconFactory iconFactory = IconFactory.getInstance(MainActivity.this);
-                    Icon icon = iconFactory.fromResource(R.drawable.blue_marker);
+                    Icon icon = iconFactory.defaultMarker();
                     final MarkerViewOptions markerViewOptions = new MarkerViewOptions()
                             .icon(icon)
                             .title(title)
