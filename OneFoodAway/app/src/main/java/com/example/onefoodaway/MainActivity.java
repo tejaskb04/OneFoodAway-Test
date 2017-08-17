@@ -6,7 +6,6 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.os.Handler;
-import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.os.Bundle;
@@ -22,7 +21,6 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.mapbox.mapboxsdk.Mapbox;
-import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerViewOptions;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
@@ -207,7 +205,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         try {
             JSONArray jsonArray = data.getJSONArray("results");
             if (data.getString("status").equalsIgnoreCase("OK")) {
-                // FAULTY CODE BELOW
+                // CLEAR MAP FAULTY LOGIC BELOW
                 /*
                 mapView.getMapAsync(new OnMapReadyCallback() {
                     @Override
@@ -232,13 +230,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                         @Override
                         public void onMapReady(MapboxMap mapboxMap) {
                             mapboxMap.addMarker(markerViewOptions);
-                            mapboxMap.setOnMarkerClickListener(new MapboxMap.OnMarkerClickListener() {
-                                @Override
-                                public boolean onMarkerClick(@NonNull Marker marker) {
-                                    // Send User to Directions to Location
-                                    return false;
-                                }
-                            });
                         }
                     });
                 }
