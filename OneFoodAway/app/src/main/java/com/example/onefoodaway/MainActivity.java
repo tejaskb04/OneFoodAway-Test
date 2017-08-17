@@ -208,12 +208,15 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         try {
             JSONArray jsonArray = data.getJSONArray("results");
             if (data.getString("status").equalsIgnoreCase("OK")) {
+                // FAULTY CODE BELOW
+                /*
                 mapView.getMapAsync(new OnMapReadyCallback() {
                     @Override
                     public void onMapReady(MapboxMap mapboxMap) {
                         mapboxMap.clear();
                     }
                 });
+                */
                 for (int i = 0; i < jsonArray.length(); i++) {
                     JSONObject place = jsonArray.getJSONObject(i);
                     if (!place.isNull("name")) {
