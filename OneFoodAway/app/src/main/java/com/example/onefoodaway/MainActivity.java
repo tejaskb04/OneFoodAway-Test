@@ -77,8 +77,100 @@ public class MainActivity extends AppCompatActivity {
                     });
                 }
             };
-            handler.postAtTime(runnable, System.currentTimeMillis() + INTERVAL);
+            handler.postAtTime(runnable, System.currentTimeMillis() + INTERVAL); // Change Time Interval
             handler.postDelayed(runnable, INTERVAL);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION: {
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    final int INTERVAL = 1000;
+                    final Handler handler = new Handler();
+                    final Runnable runnable = new Runnable() {
+                        @Override
+                        public void run() {
+                            mapView.getMapAsync(new OnMapReadyCallback() {
+                                @Override
+                                public void onMapReady(MapboxMap mapboxMap) {
+                                    mapboxMap.getUiSettings().setCompassEnabled(false);
+                                    mapboxMap.setMyLocationEnabled(true);
+                                    CameraPosition cameraPosition = new CameraPosition.Builder()
+                                            .target(new LatLng(mapboxMap.getMyLocation()))
+                                            .zoom(13)
+                                            .bearing(270)
+                                            .tilt(20)
+                                            .build();
+                                    mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 5000);
+                                }
+                            });
+                        }
+                    };
+                    handler.postAtTime(runnable, System.currentTimeMillis() + INTERVAL); // Change Time Interval
+                    handler.postDelayed(runnable, INTERVAL);
+                } else {
+                    // STUB
+                }
+                return;
+            }
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.recenter: {
+                mapView.getMapAsync(new OnMapReadyCallback() {
+                    @Override
+                    public void onMapReady(MapboxMap mapboxMap) {
+                        CameraPosition cameraPosition = new CameraPosition.Builder()
+                                .target(new LatLng(mapboxMap.getMyLocation()))
+                                .build();
+                        mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 500);
+                    }
+                });
+                return true;
+            }
+            case R.id.radius: {
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("Set Radius"); // Create Custom Title
+                final EditText input = new EditText(this);
+                builder.setView(input);
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        try {
+                            radius = Integer.parseInt(input.getText().toString());
+                        }
+                        catch (NumberFormatException e) {
+                            Toast toast = Toast.makeText(MainActivity.this, "Invalid Input", Toast.LENGTH_SHORT);
+                            toast.show();
+                        }
+                    }
+                });
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // STUB
+                    }
+                });
+                AlertDialog alertDialog = builder.create();
+                alertDialog.show();
+                return true;
+            }
+            default: {
+                return super.onOptionsItemSelected(item);
+            }
         }
     }
 
@@ -111,7 +203,7 @@ public class MainActivity extends AppCompatActivity {
         try {
             JSONArray jsonArray = data.getJSONArray("results");
             if (data.getString("status").equalsIgnoreCase("OK")) {
-                // CLEAR MAP FAULTY LOGIC BELOW
+                // FAULTY CODE BELOW
                 /*
                 mapView.getMapAsync(new OnMapReadyCallback() {
                     @Override
@@ -142,98 +234,6 @@ public class MainActivity extends AppCompatActivity {
             }
         } catch (JSONException e) {
             // Show Error Message
-        }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.recenter: {
-                mapView.getMapAsync(new OnMapReadyCallback() {
-                    @Override
-                    public void onMapReady(MapboxMap mapboxMap) {
-                        CameraPosition cameraPosition = new CameraPosition.Builder()
-                                .target(new LatLng(mapboxMap.getMyLocation()))
-                                .build();
-                        mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 500);
-                    }
-                });
-                return true;
-            }
-            case R.id.radius: {
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setTitle("Set Radius");
-                final EditText input = new EditText(this);
-                builder.setView(input);
-                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        try {
-                            radius = Integer.parseInt(input.getText().toString());
-                        }
-                        catch (NumberFormatException e) {
-                            Toast toast = Toast.makeText(MainActivity.this, "Invalid Input", Toast.LENGTH_SHORT);
-                            toast.show();
-                        }
-                    }
-                });
-                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        // STUB
-                    }
-                });
-                AlertDialog alertDialog = builder.create();
-                alertDialog.show();
-                return true;
-            }
-            default: {
-                return super.onOptionsItemSelected(item);
-            }
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode,
-            String permissions[], int[] grantResults) {
-        switch (requestCode) {
-            case MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION: {
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    final int INTERVAL = 1000;
-                    final Handler handler = new Handler();
-                    final Runnable runnable = new Runnable() {
-                        @Override
-                        public void run() {
-                            mapView.getMapAsync(new OnMapReadyCallback() {
-                                @Override
-                                public void onMapReady(MapboxMap mapboxMap) {
-                                    mapboxMap.getUiSettings().setCompassEnabled(false);
-                                    mapboxMap.setMyLocationEnabled(true);
-                                    CameraPosition cameraPosition = new CameraPosition.Builder()
-                                            .target(new LatLng(mapboxMap.getMyLocation()))
-                                            .zoom(13)
-                                            .bearing(270)
-                                            .tilt(20)
-                                            .build();
-                                    mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 5000);
-                                }
-                            });
-                        }
-                    };
-                    handler.postAtTime(runnable, System.currentTimeMillis() + INTERVAL);
-                    handler.postDelayed(runnable, INTERVAL);
-                } else {
-                    // STUB
-                }
-                return;
-            }
         }
     }
 
@@ -279,3 +279,9 @@ public class MainActivity extends AppCompatActivity {
         mapView.onSaveInstanceState(outState);
     }
 }
+
+/*
+BUGS:
+    1. Changing radius of Nearby Food Locations Search not functional
+    2. Camera does not center with user
+*/
