@@ -38,6 +38,7 @@ public class MainActivity extends AppCompatActivity implements MapboxMap.OnMyLoc
     private final String GOOGE_PLACES_API_KEY = "AIzaSyAH008n41rXGsO2oYtJgZduebNYwN127_I";
     private final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 100;
     private MapView mapView;
+    private boolean locationFound = false;
     private int radius = 5000;
 
     @Override
@@ -55,6 +56,18 @@ public class MainActivity extends AppCompatActivity implements MapboxMap.OnMyLoc
                     MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
         }
         else {
+            while (!locationFound) {
+                mapView.getMapAsync(new OnMapReadyCallback() {
+                    @Override
+                    public void onMapReady(MapboxMap mapboxMap) {
+                        mapboxMap.setMyLocationEnabled(true);
+                        Location location = new Location(mapboxMap.getMyLocation());
+                        if (location != null) {
+                            locationFound = true;
+                        }
+                    }
+                });
+            }
             mapView.getMapAsync(new OnMapReadyCallback() {
                 @Override
                 public void onMapReady(MapboxMap mapboxMap) {
@@ -80,6 +93,18 @@ public class MainActivity extends AppCompatActivity implements MapboxMap.OnMyLoc
             case MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION: {
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    while (!locationFound) {
+                        mapView.getMapAsync(new OnMapReadyCallback() {
+                            @Override
+                            public void onMapReady(MapboxMap mapboxMap) {
+                                mapboxMap.setMyLocationEnabled(true);
+                                Location location = new Location(mapboxMap.getMyLocation());
+                                if (location != null) {
+                                    locationFound = true;
+                                }
+                            }
+                        });
+                    }
                     mapView.getMapAsync(new OnMapReadyCallback() {
                         @Override
                         public void onMapReady(MapboxMap mapboxMap) {
@@ -179,6 +204,7 @@ public class MainActivity extends AppCompatActivity implements MapboxMap.OnMyLoc
                         // Show Error Message
                     }
                 });
+        jsonObjectRequest.setShouldCache(false);
         AppController.getInstance().addToRequestQueue(jsonObjectRequest);
     }
 
@@ -284,12 +310,12 @@ public class MainActivity extends AppCompatActivity implements MapboxMap.OnMyLoc
 
 /*
 TODO:
-    1. Implement External Storage logic
 */
 
 /*
 BUGS:
-    1. Changing radius of Nearby Food Locations Search not functional
-    2. New markers do not appear when in range and old markers do not disappear when out of range
-    3. Camera does not center with user
+    1. mapView sometimes loads before user location is found
+    2. Camera does not center with user
+    3. Changing radius of Nearby Food Locations Search not functional
+    4. New markers do not appear when in range and old markers do not disappear when out of range
 */
